@@ -190,6 +190,7 @@ else
     ccloud kafka topic create 'postgres.bank.customers'
     ccloud kafka topic create 'postgres.bank.accounts'
     ccloud kafka topic create 'postgres.bank.transactions'
+    ccloud kafka topic create 'express.bank.transactions'
     echo "DONE" > .ids/TOPICS
     echo "🤩" "Done."
 fi
