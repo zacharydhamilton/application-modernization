@@ -106,7 +106,7 @@ kubectl create secret generic kafka-secrets \
 The following steps with bring you through the process of "Modernizing" the provided application using Confluent Cloud and Kafka. Use the following simple diagram to capture the basic flow (not everything is depicted).
 
 <div align="center">
-    <img src="images/phase-flow.png" width=75% height=75%>
+    <img src="images/phase-flow.png" width=100% height=100%>
 </div>
 
 ### Deploy the "monolith"
