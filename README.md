@@ -31,14 +31,14 @@ The following is the "inventory" of things created and used in this demo so you 
 - **Confluent Cloud Environment**. This can be either newly created or shared. 
 - **Confluent Cloud Schema Registry**. This can be the already enabled registry of an existing environment, or a new registry enabled in a brand new one. Doesn't matter.
     - `SCHEMA_REGISTRY_URL` will need to be collected as the URL of the registry instance.
-    - `SCHEMA_REGISTRY_KEY` will need to be created and saved if not already available. 
-    - `SCHEMA_REGISTRY_SECRET` will come paired with the above 👆 .
+    - `SCHEMA_REGISTRY_API_KEY` will need to be created and saved if not already available. 
+    - `SCHEMA_REGISTRY_API_SECRET` will come paired with the above 👆 .
 - **Confluent Cloud Cluster**. You will use this as your Kafka Cluster.
     - `BOOTSTRAP_SERVERS` will be necessary to connect Connectors and clients to Confluent Cloud. 
-    - `CLOUD_KEY` will be the API key the Connectors and clients will use to authenticate to the cluster. You'll need to create API keys if you don't have them already.
-    - `CLOUD_SECRET` will be the secret paired with the above 👆 .
+    - `CLIENT_KEY` will be the API key the Connectors and clients will use to authenticate to the cluster. You'll need to create API keys if you don't have them already.
+    - `CLIENT_SECRET` will be the secret paired with the above 👆 .
 - **ksqlDB Application**. You'll use this to process messages in real time and make them available to your API. 
-    - `KSQLDB_API_ENDPOINT` will be needed so the client can query the ksqlDB app.
+    - `KSQLDB_APP_ENDPOINT` will be needed so the client can query the ksqlDB app.
     - `KSQLDB_API_KEY` will be necessary to authenticate queries from the client to the ksqlDB app. 
     - `KSQLDB_API_SECRET` will go with the key above 👆 .
 - **Topics**. You'll need to create a new ahead of time so the Connectors will work. 
@@ -54,35 +54,51 @@ Whether you used the `bootstrap.sh` script to create everything or you did it ma
 ### Created with `bootstrap.sh`
 
 `bootstrap.sh` should have conveniently added all the necessary credentials and IDs into the following files you can see referenced in the command. So, assuming everything worked, you can just copy paste this command to create your secret `kafka-secrets`. 
+
+First, if you don't have `minikube` running already, start it.
+
+```sh
+minikube start
+```
+
+Then:
     
 ```sh
-kubectl create secret generic kafka-secrets --from-file=.ids/BOOTSTRAP_SERVERS --from-file=.creds/CLOUD_KEY --from-file=.creds/CLOUD_SECRET --from-file=.creds/SASL_JAAS_CONFIG --from-file=.creds/SCHEMA_REGISTRY_KEY --from-file=.creds/SCHEMA_REGISTRY_SECRET --from-file=.creds/SCHEMA_REGISTRY_BASIC_AUTH_USER_INFO --from-file=.ids/SCHEMA_REGISTRY_URL --from-file=.creds/KSQLDB_API_KEY --from-file=.creds/KSQLDB_API_SECRET --from-file=.ids/KSQLDB_API_ENDPOINT
+kubectl create secret generic kafka-secrets --from-file=.ids/BOOTSTRAP_SERVERS --from-file=.creds/CLIENT_KEY --from-file=.creds/CLIENT_SECRET --from-file=.creds/SASL_JAAS_CONFIG --from-file=.creds/SCHEMA_REGISTRY_API_KEY --from-file=.creds/SCHEMA_REGISTRY_API_SECRET --from-file=.creds/SCHEMA_REGISTRY_BASIC_AUTH_USER_INFO --from-file=.ids/SCHEMA_REGISTRY_URL --from-file=.creds/KSQLDB_API_KEY --from-file=.creds/KSQLDB_API_SECRET --from-file=.ids/KSQLDB_APP_ENDPOINT
 ```
 
 ### Created manually
 
 All of the following should be self explanatory with the exception of `SASL_JAAS_CONFIG` and `SCHEMA_REGISTRY_BASIC_AUTH_USER_INFO`. However, these are simple and are as follows.
 
-- `SASL_JAAS_CONFIG` = `org.apache.kafka.common.security.plain.PlainLoginModule required username='<CLOUD_KEY>' password='<CLOUD_SECRET>';`
-    - Simply replace `<CLOUD_KEY>` and `<CLOUD_SECRET>` with your values.
-- `SCHEMA_REGISTRY_BASIC_AUTH_USER_INFO` = `<SCHEMA_REGISTRY_KEY>:<SCHEMA_REGISTRY_SECRET>`
-    - Once again, just replacing `<SCHEMA_REGISTRY_KEY>` and `<SCHEMA_REGISTRY_SECRET>`.
+- `SASL_JAAS_CONFIG` = `org.apache.kafka.common.security.plain.PlainLoginModule required username='<CLIENT_KEY>' password='<CLIENT_SECRET>';`
+    - Simply replace `<CLIENT_KEY>` and `<CLIENT_SECRET>` with your values.
+- `SCHEMA_REGISTRY_BASIC_AUTH_USER_INFO` = `<SCHEMA_REGISTRY_API_KEY>:<SCHEMA_REGISTRY_API_SECRET>`
+    - Once again, just replacing `<SCHEMA_REGISTRY_API_KEY>` and `<SCHEMA_REGISTRY_API_SECRET>`.
 
 To create the secret, replace the templates in the follow command and create the secret from there. Make sure to replace things within `<setting>`. 
+
+Like above, if you don't have `minikube` running already, start it.
+
+```sh
+minikube start
+```
+
+then:
 
 ```sh
 kubectl create secret generic kafka-secrets \
     --from-literal=BOOTSTRAP_SERVERS="<BOOTSTRAP_SERVERS>" \
-    --from-literal=CLOUD_KEY="<CLOUD_KEY>" \
-    --from-literal=CLOUD_SECRET="<CLOUD_SECRET>" \
+    --from-literal=CLIENT_KEY="<CLIENT_KEY>" \
+    --from-literal=CLIENT_SECRET="<CLIENT_SECRET>" \
     --from-literal=SASL_JAAS_CONFIG="<SASL_JAAS_CONFIG>" \
-    --from-literal=SCHEMA_REGISTRY_KEY="<SCHEMA_REGISTRY_KEY>" \
-    --from-literal=SCHEMA_REGISTRY_SECRET="<SCHEMA_REGISTRY_SECRET>" \
+    --from-literal=SCHEMA_REGISTRY_API_KEY="<SCHEMA_REGISTRY_API_KEY>" \
+    --from-literal=SCHEMA_REGISTRY_API_SECRET="<SCHEMA_REGISTRY_API_SECRET>" \
     --from-literal=SCHEMA_REGISTRY_BASIC_AUTH_USER_INFO="<SCHEMA_REGISTRY_BASIC_AUTH_USER_INFO>" \
     --from-literal=SCHEMA_REGISTRY_URL="<SCHEMA_REGISTRY_URL>" \
     --from-literal=KSQLDB_API_KEY="<KSQLDB_API_KEY>" \
     --from-literal=KSQLDB_API_SECRET="<KSQLDB_API_SECRET>" \
-    --from-literal=KSQLDB_API_ENDPOINT="<KSQLDB_API_ENDPOINT>"
+    --from-literal=KSQLDB_APP_ENDPOINT="<KSQLDB_APP_ENDPOINT>"
 ```
 
 ## Getting Started
@@ -213,7 +229,7 @@ Once both have been created, you can play around by selecting from them in the e
         ```
     - Create the web application deployment for "mf2".
         ```sh
-        kubectl delete -f k8s/webapp-deployment-mf2.yaml
+        kubectl create -f k8s/webapp-deployment-mf2.yaml
         ```
     There's probably a better way to do this, but I'm no Kubernetes administrator 😇 . 
 
