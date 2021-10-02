@@ -84,7 +84,7 @@ Like above, if you don't have `minikube` running already, start it.
 minikube start
 ```
 
-then:
+Then:
 
 ```sh
 kubectl create secret generic kafka-secrets \
