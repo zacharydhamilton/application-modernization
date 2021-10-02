@@ -1,9 +1,8 @@
 # general
 clipboard.file
-.ids/
-.creds/
 notes
-setup.properties
+.config
+.secrets
 
 # 'webapp'
 webapp-mf1/node_modules/
